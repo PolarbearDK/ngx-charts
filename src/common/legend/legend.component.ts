@@ -23,6 +23,13 @@ import {
               [formattedLabel]="entry.formattedLabel"
               [color]="entry.color"
               [isActive]="isActive(entry)"
+
+ngx-tooltip
+      [tooltipDisabled]="tooltipDisabled || !tooltipFunc"
+      [tooltipPlacement]="'top'"
+      [tooltipType]="'tooltip'"
+      [tooltipTitle]="entry.tooltipText">
+
               (select)="labelClick.emit($event)"
               (activate)="activate($event)"
               (deactivate)="deactivate($event)">
@@ -44,6 +51,8 @@ export class LegendComponent implements OnChanges {
   @Input() height;
   @Input() width;
   @Input() activeEntries;
+  @Input() tooltipDisabled: boolean = true;
+  @Input() tooltipFunc: (label: any) => number;
 
   @Output() labelClick: EventEmitter<any> = new EventEmitter();
   @Output() labelActivate: EventEmitter<any> = new EventEmitter();
@@ -73,10 +82,20 @@ export class LegendComponent implements OnChanges {
       });
 
       if (idx === -1) {
+        let tooltipText: string;
+        if (this.tooltipFunc && !this.tooltipDisabled) {
+          const value = this.tooltipFunc(label);
+          tooltipText = `
+  <span class="tooltip-label">${formattedLabel}</span>
+  <span class="tooltip-val">${value.toLocaleString()}</span>
+`;
+        }
+
         items.push({
           label,
           formattedLabel,
-          color: this.colors.getColor(label)
+          color: this.colors.getColor(label),
+          tooltipText,
         });
       }
     }

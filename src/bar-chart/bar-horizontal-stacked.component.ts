@@ -249,7 +249,8 @@ export class BarHorizontalStackedComponent extends BaseChartComponent {
       scaleType: this.schemeType,
       colors: undefined,
       domain: [],
-      title: undefined
+      title: undefined,
+      tooltipFunc: (x) => this.getSeriesTotal(x),
     };
     if (opts.scaleType === 'ordinal') {
       opts.domain = this.innerDomain;
@@ -261,6 +262,30 @@ export class BarHorizontalStackedComponent extends BaseChartComponent {
     }
 
     return opts;
+  }
+
+  getSeriesTotal(seriesName: any): number {
+    let sum = 0;
+    for (const group of this.results) {
+      for (const series of group.series) {
+        if (series.name === seriesName) {
+          sum += series.value;
+        }
+      }
+    }
+    return sum;
+  }
+
+  getGroupTotal(groupName: any): number {
+    let sum = 0;
+    for (const group of this.results) {
+      if (group.name === groupName) {
+        for (const series of group.series) {
+          sum += series.value;
+        }
+      }
+    }
+    return sum;
   }
 
   updateYAxisWidth({ width }): void {
